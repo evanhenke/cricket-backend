@@ -1,0 +1,24 @@
+{
+  "name": "cricket",
+  "version": "0.0.1",
+  "description": "Everyone has a story to tell",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server"
+  },
+  "author": "Evan Henke",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "bootstrap": "^4.0.0-alpha.6",
+    "cors": "^2.8.4",
+    "express": "^4.15.3",
+    "fs": "0.0.1-security",
+    "graceful-fs": "^4.1.11",
+    "mongoose": "^4.11.4",
+    "mongoose-unique-validator": "^1.0.6"
+  },
+  "devDependencies": {
+  }
+}
