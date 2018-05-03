@@ -4,7 +4,10 @@ var Book = require('../schemas/BookSchema.js');
 var Page = require('../schemas/PageSchema.js');
 
 module.exports = function(app){
-    //get all books... not sure why anyone would do this, it'd be a huge number
+
+    /**
+     * Sends a response containing all books
+     */
     app.get('/book',function(req,res){
         Book.find(function(error,books){
             if(error){
@@ -15,7 +18,9 @@ module.exports = function(app){
         });
     });
 
-    //get all books by an author's username
+    /**
+     * Sends a response containing all books written by a specified user by username
+     */
     app.get('/book/:username',function(req,res){
         User.findByUsername(req.params.username)
             .then(function(user){
@@ -29,7 +34,9 @@ module.exports = function(app){
             });
     });
 
-    //create a book for a user
+    /**
+     * Creates a book for a specified author and sends a response of the book
+     */
     app.post('/book',function(req,res){
         User.findByUsername(req.body.username).then(function(author){
             Book.create({
@@ -57,7 +64,9 @@ module.exports = function(app){
         });
     });
 
-    //update book
+    /**
+     * Updates a book
+     */
     app.put('/book',function(req,res){
         Book.findByIdAndUpdate(
             mongoose.Types.ObjectId(req.body.id),

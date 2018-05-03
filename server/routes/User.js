@@ -1,5 +1,6 @@
 var User = require('../schemas/UserSchema.js');
 var mongoose = require('mongoose');
+var Authentication = require('./Authentication/Authenticator');
 
 module.exports = function(app){
 
@@ -7,7 +8,7 @@ module.exports = function(app){
     app.get('/user',function(req,res){
         User.find(function(error,users){
             if (error){
-                res.send(error);
+                console.log(error);
             } else {
                 res.json(users);
             }
@@ -19,7 +20,7 @@ module.exports = function(app){
         User.findByUsername(req.params.username).then(function(user){
             res.json(user);
         },function(error){
-            handleError(error);
+            console.log(error);
         });
     });
 
@@ -30,15 +31,16 @@ module.exports = function(app){
             usernameLowerCase:req.body.username.toLowerCase(),
             password:req.body.password,
             firstName:req.body.firstName,
-            lastName:req.body.lastName
+            lastName:req.body.lastName,
+            email:req.body.email
         }, function(error,user){
             if (error){
-                res.send(error);
+                console.log(error);
             } else {
                 User.findByUsername(user.username).then(function(u){
                     res.json(u);
                 },function(error){
-                    handleError(error);
+                    console.log(error);
                 });
             }
         });
@@ -73,7 +75,7 @@ module.exports = function(app){
         User.findByIdAndDelete(
             req.body.id,
             function(error){
-                res.json(error);
+                console.log(error);
             }
         );
     });

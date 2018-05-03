@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var uniqueValidator = require('mongoose-unique-validator');
+var Authentication = require('../routes/Authentication/Authenticator')();
 
 var userSchema = new Schema({
     username: {
@@ -10,7 +11,7 @@ var userSchema = new Schema({
         unique:true,
         uniqueCaseInsensitive:true,
         match:[
-            new RegExp("[a-zA-Z0-9]"),
+            new RegExp("^[a-zA-Z0-9_.-]*$"),
             "Username only allows letters and numbers!"
         ]
     },
@@ -24,7 +25,7 @@ var userSchema = new Schema({
         maxlength:30,
         minlength:8,
         match:[
-            new RegExp("[a-zA-Z0-9!@#$%^&*_+=-]"),
+            new RegExp("^[a-zA-Z0-9!@#$%^&*_+=-]*$"),
             "Password only allows letters, numbers, and the following characters: !,@,#,$,%,^,&,*,_,+,=,- "
         ]
     },
@@ -32,7 +33,7 @@ var userSchema = new Schema({
         type:String,
         required:true,
         match:[
-            new RegExp("[a-zA-Z]"),
+            new RegExp("^[a-zA-Z]*$"),
             "First name only allows letters!"
         ]
     },
@@ -40,8 +41,17 @@ var userSchema = new Schema({
         type:String,
         required:true,
         match:[
-            new RegExp("[a-zA-Z]"),
+            new RegExp("^[a-zA-Z]*$"),
             "Last name only allows letters!"
+        ]
+    },
+    email: {
+        type:String,
+        required:true,
+        match:[
+            new RegExp("^(([^<>()\\[\\]\\\\.,;:\\s@\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\"]+)*)|(\".+\"))@" +
+                "((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$"),
+            "Email format is invalid!"
         ]
     },
     createDate: {
@@ -60,5 +70,12 @@ userSchema.statics.findByUsername = function(username){
             }
         });
 };
+
+userSchema.pre('save', function(next) {
+    Authentication.encryptPassword(this,function(error){
+        if(error) console.log(error);
+        next();
+    });
+});
 
 module.exports = mongoose.model('User', userSchema);
