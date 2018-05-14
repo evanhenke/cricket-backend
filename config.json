@@ -1,0 +1,3 @@
+{
+  "mongo_uri":"mongodb://db_admin:admin123@ds161304.mlab.com:61304/heroku_wr7rs89k"
+}
