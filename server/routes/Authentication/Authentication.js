@@ -8,14 +8,15 @@ module.exports = function(app){
      * Sends a boolean value
      */
     app.post('/user/auth',function(req,res){
-        var error = null;
-        User.findOne({usernameLowerCase:req.body.username.toLowerCase()},
-            function(err,user){
-                if(err) error = err;
-                Authenticator.authenticate(user,req.body.password,function(err,ok){
-                    if(err) error = err;
-                    res.send(ok);
-                });
+        User.findByUsername(req.body.username.toLowerCase(),
+            function(error,user){
+                if(error) {
+                    console.log(error);
+                }
+                else
+                    Authenticator.authenticate(user, req.body.password, function (err, ok) {
+                        res.send(ok);
+                    });
             });
     });
 };

@@ -24,12 +24,10 @@ module.exports = function () {
      */
     var authenticate = function (user, password, cb) {
         bcrypt.compare(password,user.password,function(error,result){
-            if (error) {
-                console.log(error);
+            if (error)
                 cb(error);
-            } else {
+            else
                 cb(null,result);
-            }
         })
     };
 

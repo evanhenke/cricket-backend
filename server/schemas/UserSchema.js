@@ -1,12 +1,19 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var uniqueValidator = require('mongoose-unique-validator');
-var Authentication = require('../routes/Authentication/Authenticator')();
+var Authenticator = require('../routes/Authentication/Authenticator')();
 
 var userSchema = new Schema({
     username: {
         type:String,
-        maxlength:30,
+        maxlength:[
+            30,
+            "Maximum length for a username is thirty (30) characters!"
+        ],
+        minlength:[
+            8,
+            "Minimum length for a username is eight (8) characters!"
+        ],
         required:true,
         unique:true,
         uniqueCaseInsensitive:true,
@@ -22,8 +29,14 @@ var userSchema = new Schema({
     password: {
         type:String,
         required:true,
-        maxlength:30,
-        minlength:8,
+        maxlength:[
+            30,
+            "Maximum length for a password is thirty (30) characters!"
+        ],
+        minlength:[
+            8,
+            "Minimum length for a password is eight (8) characters!"
+        ],
         match:[
             new RegExp("^[a-zA-Z0-9!@#$%^&*_+=-]*$"),
             "Password only allows letters, numbers, and the following characters: !,@,#,$,%,^,&,*,_,+,=,- "
@@ -62,17 +75,19 @@ var userSchema = new Schema({
 
 userSchema.plugin(uniqueValidator);
 
-userSchema.statics.findByUsername = function(username){
+userSchema.statics.findByUsername = function(username,callback){
+    if(!callback) throw "findByUsername needs a callback!";
     return this.findOne({usernameLowerCase:username.toLowerCase()},
         function(error,result){
-            if(error){
-                console.log(error);
-            }
+            if(!error && !result)
+                callback(new Error('No user was returned with the given username.'));
+            else
+                callback(null,result);
         });
 };
 
 userSchema.pre('save', function(next) {
-    Authentication.encryptPassword(this,function(error){
+    Authenticator.encryptPassword(this,function(error){
         if(error) console.log(error);
         next();
     });

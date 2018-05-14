@@ -17,11 +17,17 @@ module.exports = function(app){
 
     //get a single user by their username
     app.get('/user/:username',function(req,res){
-        User.findByUsername(req.params.username).then(function(user){
-            res.json(user);
-        },function(error){
-            console.log(error);
-        });
+        User.findByUsername(req.params.username, function(error,result){
+            if(error) {
+                console.log(error);
+                res.status(404).json({
+                    Error:{
+                        message:error.message
+                    }
+                });
+            }
+            res.json(result);
+        })
     });
 
     //create a user
@@ -37,11 +43,7 @@ module.exports = function(app){
             if (error){
                 console.log(error);
             } else {
-                User.findByUsername(user.username).then(function(u){
-                    res.json(u);
-                },function(error){
-                    console.log(error);
-                });
+                res.json(user);
             }
         });
     });
@@ -63,7 +65,7 @@ module.exports = function(app){
             },
             function(error,user){
                 if(error){
-                    res.json(error);
+                    console.log(error);
                 } else {
                     res.json(user);
                 }
