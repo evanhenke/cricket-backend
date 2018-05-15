@@ -82,7 +82,7 @@ userSchema.statics.findByUsername = function(username,callback){
             if(!error && !result)
                 callback(new Error('No user was returned with the given username.'));
             else
-                callback(null,result);
+                callback(error,result);
         });
 };
 
