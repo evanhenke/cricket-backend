@@ -25,7 +25,13 @@ var userSchema = new Schema({
     },
     usernameLowerCase: {
         type:String,
-        lowercase:true
+        lowercase:true,
+        required:true,
+        match:[
+            new RegExp("^[a-z0-9_.-]*$"),
+            "Username only allows letters and numbers!"
+        ]
+
     },
     password: {
         type:String,
@@ -82,7 +88,7 @@ userSchema.plugin(uniqueValidator);
  * @returns {Query|void|index|number|*|T}
  */
 userSchema.statics.findAll = function(callback){
-    return this.find(callback);
+    return this.find(wrapCallbackForErrors(callback));
 };
 
 /**
@@ -93,25 +99,74 @@ userSchema.statics.findAll = function(callback){
  */
 userSchema.statics.findByUsername = function(username,callback){
     return this.findOne({usernameLowerCase:username.toLowerCase()},
-        function(error,result){
-            if(error)
-                callback(new Error(error.message));
-            else if(!result)
-                callback(new NoResourceReturnedError("No User found for username: " + username));
-            else
-                callback(null,result);
-        });
+        wrapCallbackForErrors(callback));
+};
+
+/**
+ * Create wrapper to create a user
+ * @param obj holds parameters for the user, .create should handle missing entries,
+ *          consider checking first to throw custom errors
+ * @param callback with error and result parameters
+ * @returns {obj}
+ */
+userSchema.statics.createUser = function(obj,callback){
+    if(!obj.usernameLowerCase)
+        obj.usernameLowerCase = obj.username.toLowerCase();
+    return this.create(obj,wrapCallbackForErrors(callback));
+};
+
+/**
+ * Update wrapper for updating a user's information
+ * @param id
+ * @param update change to be made
+ * @param callback with error and result parameters
+ * @returns {Query}
+ */
+userSchema.statics.updateUserById = function(id,update,callback){
+    return this.findByIdAndUpdate(
+        mongoose.Types.ObjectId(id),
+        update,
+        {
+            new:true,
+            runValidators:true
+        },
+        wrapCallbackForErrors(callback)
+    );
+};
+
+
+userSchema.statics.deleteUser = function(id,callback){
+    return this.findByIdAndDelete(
+        mongoose.Types.ObjectId(id),
+        {},
+        wrapCallbackForErrors(callback)
+    );
 };
 
 /**
  * Mongoose pre-save middleware to encrypt the user's password
  */
 userSchema.pre('save', function(next) {
-    this.usernameLowerCase = this.username.toLowerCase();
     Authenticator.encryptPassword(this,function(error){
         if(error) console.log(error);
         next();
     });
 });
+
+/**
+ * Wrapper for the callback to do error checking and applying
+ * @param callback
+ * @returns {Function}
+ */
+let wrapCallbackForErrors = function(callback){
+    return function(error,result){
+        if(error)
+            callback(error)
+        else if(!result)
+            callback(new NoResourceReturnedError("No result from web service when a result is expected!"));
+        else
+            callback(null,result);
+    }
+};
 
 module.exports = mongoose.model('User', userSchema);

@@ -1,21 +1,25 @@
 var User = require('../schemas/UserSchema.js');
-var mongoose = require('mongoose');
 var ErrorHandler = require('./../error/ErrorHandler')();
 
 module.exports = function(app){
 
-    //get all users
+    /**
+     * GET request that returns all users
+     */
     app.get('/user',function(req,res){
         User.findAll(function(error,users){
             if (error){
-                console.log(error);
+                ErrorHandler.handle(error);
             } else {
                 res.json(users);
             }
         })
     });
 
-    //get a single user by their username
+    /**
+     * GET request that returns a single user based on a given username.
+     * Sends NoResourceReturnedError if no result is returned
+     */
     app.get('/user/:username',function(req,res){
         User.findByUsername(req.params.username, function(error,result){
             if(error)
@@ -25,9 +29,11 @@ module.exports = function(app){
         })
     });
 
-    //create a user
+    /**
+     * POST Request to create a user
+     */
     app.post('/user',function(req,res){
-        User.create({
+        User.createUser({
             username:req.body.username,
             password:req.body.password,
             firstName:req.body.firstName,
@@ -35,48 +41,48 @@ module.exports = function(app){
             email:req.body.email
         }, function(error,user){
             if (error){
-                console.log(error);
+                ErrorHandler.handle(error,res);
             } else {
-                User.findByUsername(user.username,function(error,result){
-                    if(error)
-                        ErrorHandler.handle(error,res);
-                    else
-                        res.json(result);
-                });
+                res.json(user);
             }
         });
     });
 
-    //update a user using the user's id
-    //currently only first and lastname are changeable
+    /**
+     * PUT endpoint to update a user's information
+     * Currently alterable attributes: First Name, Last Name, Email
+     */
     app.put('/user',function(req,res){
-        User.findByIdAndUpdate(
-            mongoose.Types.ObjectId(req.body.id),
+        User.updateUserById(
+            req.body.id,
             {
                 $set:{
                     firstName:req.body.firstName,
-                    lastName:req.body.lastName
+                    lastName:req.body.lastName,
+                    email:req.body.email
                 }
-            },
-            {
-                new:true,
-                runValidators:true
             },
             function(error,user){
                 if(error){
-                    console.log(error);
+                    ErrorHandler.handle(error,res);
                 } else {
                     res.json(user);
                 }
             });
     });
 
-    //delete a user
+    /**
+     * DELETE request to delete a user, sends the deleted user data back
+     */
     app.delete('/user',function(req,res){
-        User.findByIdAndDelete(
+        User.deleteUser(
             req.body.id,
-            function(error){
-                console.log(error);
+            function(error,result){
+                if(error)
+                    ErrorHandler.handle(error);
+                else
+                    res.json(result);
+
             }
         );
     });
