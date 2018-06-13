@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var uniqueValidator = require('mongoose-unique-validator');
 var Authenticator = require('../routes/Authentication/Authenticator')();
+var NoResourceReturnedError = require('./../error/types/NoResourceReturnedError');
 
 var userSchema = new Schema({
     username: {
@@ -75,18 +76,38 @@ var userSchema = new Schema({
 
 userSchema.plugin(uniqueValidator);
 
+/**
+ * Dumb wrapper for finding all users.
+ * @param callback
+ * @returns {Query|void|index|number|*|T}
+ */
+userSchema.statics.findAll = function(callback){
+    return this.find(callback);
+};
+
+/**
+ * Makes a call to the database to find a user given by a username.
+ * @param username string to search by
+ * @param callback: first parameter is error, second is the user
+ * @returns {Query|void}
+ */
 userSchema.statics.findByUsername = function(username,callback){
-    if(!callback) throw "findByUsername needs a callback!";
     return this.findOne({usernameLowerCase:username.toLowerCase()},
         function(error,result){
-            if(!error && !result)
-                callback(new Error('No user was returned with the given username.'));
+            if(error)
+                callback(new Error(error.message));
+            else if(!result)
+                callback(new NoResourceReturnedError("No User found for username: " + username));
             else
-                callback(error,result);
+                callback(null,result);
         });
 };
 
+/**
+ * Mongoose pre-save middleware to encrypt the user's password
+ */
 userSchema.pre('save', function(next) {
+    this.usernameLowerCase = this.username.toLowerCase();
     Authenticator.encryptPassword(this,function(error){
         if(error) console.log(error);
         next();

@@ -1,12 +1,12 @@
 var User = require('../schemas/UserSchema.js');
 var mongoose = require('mongoose');
-var Authentication = require('./Authentication/Authenticator');
+var ErrorHandler = require('./../error/ErrorHandler')();
 
 module.exports = function(app){
 
     //get all users
     app.get('/user',function(req,res){
-        User.find(function(error,users){
+        User.findAll(function(error,users){
             if (error){
                 console.log(error);
             } else {
@@ -18,15 +18,10 @@ module.exports = function(app){
     //get a single user by their username
     app.get('/user/:username',function(req,res){
         User.findByUsername(req.params.username, function(error,result){
-            if(error) {
-                console.log(error);
-                res.status(404).json({
-                    Error:{
-                        message:error.message
-                    }
-                });
-            }
-            res.json(result);
+            if(error)
+                ErrorHandler.handle(error,res);
+            else
+                res.json(result);
         })
     });
 
@@ -34,7 +29,6 @@ module.exports = function(app){
     app.post('/user',function(req,res){
         User.create({
             username:req.body.username,
-            usernameLowerCase:req.body.username.toLowerCase(),
             password:req.body.password,
             firstName:req.body.firstName,
             lastName:req.body.lastName,
@@ -43,7 +37,12 @@ module.exports = function(app){
             if (error){
                 console.log(error);
             } else {
-                res.json(user);
+                User.findByUsername(user.username,function(error,result){
+                    if(error)
+                        ErrorHandler.handle(error,res);
+                    else
+                        res.json(result);
+                });
             }
         });
     });
