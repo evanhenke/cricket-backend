@@ -29,6 +29,7 @@ app.use(bodyParser.json({ type: 'application/vnd.api+json' }));
 app.use(cookieParser());
 app.use(session({ secret: 'stuff' }));
 app.use(cors());
+
 app.use('/api', api);
 
 app.listen(port, () => { debug(`Listening on port ${chalk.green(port)}!`); });

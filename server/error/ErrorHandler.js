@@ -1,5 +1,8 @@
 const ErrorType = require('./types/ErrorType')();
 
+const NoResourceReturnedError = require('./../error/types/NoResourceReturnedError');
+const CricketError = require('./../error/types/CricketError');
+
 module.exports = function ErrorHandler() {
   const errorFormat = function (error) {
     return {
@@ -9,6 +12,23 @@ module.exports = function ErrorHandler() {
         stack: error.stack,
       },
       DateTime: new Date(),
+    };
+  };
+
+  /**
+   * Wrapper for the callback to do error checking and applying
+   * @param callback
+   * @returns {Function}
+   */
+  const wrapCallbackForErrors = function (callback) {
+    return function (error, result) {
+      if (error) {
+        callback(new CricketError(error));
+      } else if (!result) {
+        callback(new NoResourceReturnedError('No result from web service when a result is expected!'));
+      } else {
+        callback(null, result);
+      }
     };
   };
 
@@ -30,6 +50,7 @@ module.exports = function ErrorHandler() {
   };
 
   return {
-    handle:handle
+    handle:handle,
+    wrapCallbackForErrors:wrapCallbackForErrors
   };
 };

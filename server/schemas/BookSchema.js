@@ -1,12 +1,15 @@
 const mongoose = require('mongoose');
-
 const { Schema } = mongoose;
+const { wrapCallbackForErrors } = require('./../error/ErrorHandler')();
 
 const bookSchema = new Schema({
   title: {
     type:String,
     required:true,
-    maxlength:100,
+    maxlength:[
+      100,
+      'Maximum length for a book title is one hundred (100) characters!'
+    ],
     match:[
       new RegExp("[a-zA-Z0-9!@#$%^&*_+=\"'-]"),
       "Title only allows letters, numbers, and the following characters: !,@,#,$,%,^,&,*,_,+,=,-,\", and '"
@@ -27,6 +30,11 @@ const bookSchema = new Schema({
     default:Date.now
   }
 }, { collection: 'Book' });
+
+
+bookSchema.statics.findAll = function (callback) {
+  return this.find(wrapCallbackForErrors(callback));
+};
 
 // returns a single Book
 bookSchema.statics.findById = function (id) {

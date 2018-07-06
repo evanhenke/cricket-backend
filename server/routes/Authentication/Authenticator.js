@@ -21,7 +21,8 @@ module.exports = function () {
      * Takes a user and validates their login credentials
      * @param user used to get the hashed password
      * @param password to compare the hashed password to
-     * @param cb Callback that takes an error param and the boolean result of the password and hash comparison
+     * @param cb Callback that takes an error param and the boolean
+     *        result of the password and hash comparison
      */
   const authenticate = function (user, password, cb) {
     bcrypt.compare(password, user.password, (error, result) => {

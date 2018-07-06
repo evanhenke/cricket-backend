@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 const Authenticator = require('../routes/Authentication/Authenticator')();
-const NoResourceReturnedError = require('./../error/types/NoResourceReturnedError');
-const CricketError = require('./../error/types/CricketError');
+const { wrapCallbackForErrors } = require('./../error/ErrorHandler')();
 
 const { Schema } = mongoose;
 
@@ -83,23 +82,6 @@ const userSchema = new Schema({
 }, { collection:'User' });
 
 userSchema.plugin(uniqueValidator);
-
-/**
- * Wrapper for the callback to do error checking and applying
- * @param callback
- * @returns {Function}
- */
-const wrapCallbackForErrors = function (callback) {
-  return function (error, result) {
-    if (error) {
-      callback(new CricketError(error));
-    } else if (!result) {
-      callback(new NoResourceReturnedError('No result from web service when a result is expected!'));
-    } else {
-      callback(null, result);
-    }
-  };
-};
 
 /**
  * Dumb wrapper for finding all users.
