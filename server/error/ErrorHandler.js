@@ -35,15 +35,15 @@ module.exports = function ErrorHandler() {
   const handle = function (error, response) {
     switch (error.name) {
       case ErrorType.NO_RESOURCE_RETURNED:
-        console.log(`No resource found error ${error}`);
+        console.log(`No resource found error ${error.stack}`);
         response.status(404).send(errorFormat(error));
         break;
       case ErrorType.CRICKET_ERROR:
-        console.log(`error ${error}`);
+        console.log(`Cricket Error ${error.stack}`);
         response.status(500).send(errorFormat(error));
         break;
       default:
-        console.log(`none of the above error ${error}`);
+        console.log(`none of the above error ${error.stack}`);
         response.status(500).send(errorFormat(error));
         break;
     }

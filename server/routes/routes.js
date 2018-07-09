@@ -1,14 +1,14 @@
 const express = require('express');
 const User = require('./User.js');
 const Book = require('./Book.js');
-const Authenticator = require('./Authentication/Authentication');
+const Authentication = require('./Authentication/Authentication');
 
-const app = express();
+const app = express.Router();
 
 module.exports = function () {
-  User();
-  Book();
-  Authenticator();
+  app.use(User());
+  app.use(Book());
+  app.use(Authentication());
 
   return app;
 };

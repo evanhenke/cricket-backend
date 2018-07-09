@@ -15,7 +15,7 @@ module.exports = function () {
     .get((req, res) => {
       Book.findAll((error, books) => {
         if (error) {
-          ErrorHandler.handle(error);
+          ErrorHandler.handle(error, res);
         } else {
           res.json(books);
         }
@@ -25,7 +25,7 @@ module.exports = function () {
     /**
        * Creates a book for a specified author and sends a response of the book
        */
-    .post((req, res) => {
+    /*.post((req, res) => {
       User.findByUsername(req.body.username).then((author) => {
         Book.create({
           title:req.body.title,
@@ -50,7 +50,7 @@ module.exports = function () {
       }, (error) => {
         res.json(error);
       });
-    })
+    })*/
 
     /**
        * Updates a book
@@ -78,22 +78,24 @@ module.exports = function () {
       );
     });
 
-  bookRouter.route('/:username')
+  bookRouter.route('/book/:username')
     /**
      * Sends a response containing all books written by a specified user by username
      */
     .get((req, res) => {
-      User.findByUsername(req.params.username)
-        .then((user) => {
-          Book.findByAuthorId(user._id).then((books) => {
-            res.json(books);
-          }, (error) => {
-            res.json(error);
+      User.findByUsername(req.params.username, (error, user) => {
+        if (error) {
+          ErrorHandler.handle(error, res);
+        } else {
+          Book.findByAuthorId(user._id, (err, books) => {
+            if (error) {
+              ErrorHandler.handle(err, res);
+            } else {
+              res.json(books);
+            }
           });
-        }, (error) => {
-          res.json(error);
-        });
-    });
+        }
+      });
 
   bookRouter.route('/:id/pages')
     .get((req, res) => {

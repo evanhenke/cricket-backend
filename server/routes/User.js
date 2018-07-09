@@ -12,7 +12,7 @@ module.exports = function () {
     .get((req, res) => {
       User.findAll((error, users) => {
         if (error) {
-          ErrorHandler.handle(error);
+          ErrorHandler.handle(error, res);
         } else {
           res.json(users);
         }
@@ -70,7 +70,7 @@ module.exports = function () {
         req.body.id,
         (error, result) => {
           if (error) {
-            ErrorHandler.handle(error);
+            ErrorHandler.handle(error, res);
           } else {
             res.json(result);
           }
@@ -78,7 +78,7 @@ module.exports = function () {
       );
     });
 
-  userRouter.route('/:username')
+  userRouter.route('/user/:username')
   /**
    * GET request that returns a single user based on a given username.
    * Sends NoResourceReturnedError if no result is returned
