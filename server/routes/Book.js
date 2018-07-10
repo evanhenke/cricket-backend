@@ -21,37 +21,6 @@ module.exports = function () {
         }
       });
     })
-
-    /**
-       * Creates a book for a specified author and sends a response of the book
-       */
-    /*.post((req, res) => {
-      User.findByUsername(req.body.username).then((author) => {
-        Book.create({
-          title:req.body.title,
-          authorId:author._id,
-          rating:req.body.rating,
-        }, (error, book) => {
-          if (error) {
-            res.json(error);
-          } else {
-            Page.create({
-              bookId:book._id,
-              pageNumber:1,
-              text:'This is the first page!'
-            }, (err) => {
-              if (err) {
-                res.json(err);
-              }
-            });
-            res.json(book);
-          }
-        });
-      }, (error) => {
-        res.json(error);
-      });
-    })*/
-
     /**
        * Updates a book
        */
@@ -96,61 +65,20 @@ module.exports = function () {
           });
         }
       });
+    });
 
   bookRouter.route('/:id/pages')
+  /**
+   * GET all pages given by a book id
+   */
     .get((req, res) => {
-      Page.findByBookId(req.params.id)
-        .then((pages) => {
+      Page.findPagesByBookId(req.body._id, (error, pages) => {
+        if (error) {
+          ErrorHandler.handle(error);
+        } else {
           res.json(pages);
-        }, (error) => {
-          res.json(error);
-        });
-    })
-    // create a new page
-    .post((req, res) => {
-      Book.findById(req.body.bookId)
-        .then((book) => {
-          Page.findByBookId(book._id)
-            .then((pages) => {
-              Page.create({
-                bookId:book._id,
-                pageNumber:pages.length + 1,
-                text:req.body.pageText
-              }, (error, newPage) => {
-                if (error) {
-                  res.json(error);
-                } else {
-                  res.json(newPage);
-                }
-              });
-            }, (error) => {
-              res.json(error);
-            });
-        }, (error) => {
-          res.json(error);
-        });
-    })
-
-    .put((req, res) => {
-      Page.findByIdAndUpdate(
-        mongoose.Types.ObjectId(req.body.id),
-        {
-          $set:{
-            text:req.body.text
-          }
-        },
-        {
-          new:true,
-          runValidators:true
-        },
-        (error, page) => {
-          if (error) {
-            res.json(error);
-          } else {
-            res.json(page);
-          }
         }
-      );
+      });
     });
 
   return bookRouter;

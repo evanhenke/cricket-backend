@@ -124,7 +124,7 @@ userSchema.statics.createUser = function (obj, callback) {
  */
 userSchema.statics.updateUserById = function (id, update, callback) {
   return this.findByIdAndUpdate(
-    Schema.Types.ObjectId(id),
+    id,
     update,
     {
       new:true,
@@ -134,10 +134,15 @@ userSchema.statics.updateUserById = function (id, update, callback) {
   );
 };
 
-
+/**
+ * Deletes the user indicated by the id
+ * @param id
+ * @param callback
+ * @returns {*}
+ */
 userSchema.statics.deleteUser = function (id, callback) {
   return this.findByIdAndDelete(
-    Schema.Types.ObjectId(id),
+    id,
     {},
     wrapCallbackForErrors(callback)
   );

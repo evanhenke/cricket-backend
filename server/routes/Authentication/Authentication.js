@@ -1,6 +1,9 @@
 const express = require('express');
 const passport = require('passport');
+
 const authRouter = express.Router();
+const userAuthRouter = require('./../UserAuth');
+const bookAuthRouter = require('./../BookAuth');
 
 module.exports = function () {
   require('./passport')(authRouter);
@@ -33,5 +36,7 @@ module.exports = function () {
       }
     );
 
+  authRouter.use('/auth', userAuthRouter());
+  authRouter.use('/auth', bookAuthRouter());
   return authRouter;
 };

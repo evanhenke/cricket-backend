@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
+const { wrapCallbackForErrors } = require('./../error/ErrorHandler')();
 
 const pageSchema = new Schema({
   bookId:{
@@ -27,13 +28,30 @@ const pageSchema = new Schema({
   }
 }, { collection:'Page' });
 
-pageSchema.statics.findByBookId = function (bookId) {
-  return this.findOne({ bookId:bookId },
-    (error) => {
-      if (error) {
-        console.log(error);
-      }
-    });
+
+pageSchema.statics.findPagesByBookId = function (bookId, callback) {
+  return this.find({ bookId:bookId }, wrapCallbackForErrors(callback));
+};
+
+/**
+ * Delete a single page from a book.  NEED TO COME BACK TO THIS TO
+ * HANDLE UPDATING PAGE NUMBERS
+ * @param pageId
+ * @param callback
+ * @returns {Query}
+ */
+pageSchema.statics.deleteSinglePage = function (pageId, callback) {
+  return this.findOneAndRemove({ _id:pageId }, wrapCallbackForErrors(callback));
+};
+
+/**
+ * Delete all of the pages for a book
+ * @param bookId
+ * @param callback
+ * @returns {Query}
+ */
+pageSchema.statics.deleteAllPages = function (bookId, callback) {
+  return this.deleteMany({ bookId:bookId }, wrapCallbackForErrors(callback));
 };
 
 module.exports = mongoose.model('Page', pageSchema);

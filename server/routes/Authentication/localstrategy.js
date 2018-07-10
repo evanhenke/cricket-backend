@@ -8,11 +8,11 @@ function localStrategy() {
   passport.use(new Strategy((username, password, done) => {
     User.findByUsername(username, (error, user) => {
       if (error) {
-        ErrorHandler.handle(error, res);
+        ErrorHandler.handle(error);
       } else {
         Authenticator.authenticate(user, password, (err, authentic) => {
           if (err) {
-            ErrorHandler.handle(err, res);
+            ErrorHandler.handle(err);
             return done(err);
           }
           if (!authentic) {

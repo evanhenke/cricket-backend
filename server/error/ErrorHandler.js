@@ -32,20 +32,32 @@ module.exports = function ErrorHandler() {
     };
   };
 
+  const handleNoResponse = function (error) {
+    console.log(`no response object.. error is: ${error.stack}`);
+  }
+
   const handle = function (error, response) {
-    switch (error.name) {
-      case ErrorType.NO_RESOURCE_RETURNED:
-        console.log(`No resource found error ${error.stack}`);
-        response.status(404).send(errorFormat(error));
-        break;
-      case ErrorType.CRICKET_ERROR:
-        console.log(`Cricket Error ${error.stack}`);
-        response.status(500).send(errorFormat(error));
-        break;
-      default:
-        console.log(`none of the above error ${error.stack}`);
-        response.status(500).send(errorFormat(error));
-        break;
+    if (!response) {
+      handleNoResponse(error);
+    } else {
+      switch (error.name) {
+        case ErrorType.NOT_AUTHORIZED_ERROR:
+          console.log(`Not Authorized Error ${error.stack}`);
+          response.status(403).send(errorFormat(error));
+          break;
+        case ErrorType.NO_RESOURCE_RETURNED:
+          console.log(`No resource found error ${error.stack}`);
+          response.status(404).send(errorFormat(error));
+          break;
+        case ErrorType.CRICKET_ERROR:
+          console.log(`Cricket Error ${error.stack}`);
+          response.status(500).send(errorFormat(error));
+          break;
+        default:
+          console.log(`none of the above error ${error.stack}`);
+          response.status(500).send(errorFormat(error));
+          break;
+      }
     }
   };
 

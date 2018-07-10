@@ -31,50 +31,73 @@ const bookSchema = new Schema({
   }
 }, { collection: 'Book' });
 
-
+/**
+ * Finds all books
+ * @param callback
+ * @returns {Query|void|index|number|*|T}
+ */
 bookSchema.statics.findAll = function (callback) {
   return this.find(wrapCallbackForErrors(callback));
 };
 
-// returns a single Book
-bookSchema.statics.findById = function (id) {
-  return this.findOne({ _id:id },
-    (error) => {
-      if (error) {
-        console.log(error);
-      }
-    });
+/**
+ * Returns a single book given by the book id
+ * @param id
+ * @returns {Query|void}
+ */
+bookSchema.statics.findById = function (id, callback) {
+  return this.findOne({ _id:id },wrapCallbackForErrors(callback));
 };
 
-// returns a list of Books that share the same title
-bookSchema.statics.findByTitle = function (title) {
-  return this.find({ title:title },
-    (error) => {
-      if (error) {
-        console.log(error);
-      }
-    });
+/**
+ * Return list of books that share the same title
+ * @param title
+ * @returns {Query|void|index|number|*|T}
+ */
+bookSchema.statics.findByTitle = function (title, callback) {
+  return this.find({ title:title }, wrapCallbackForErrors(callback));
 };
 
-// returns a list of Books by a single author
-bookSchema.statics.findByAuthorId = function (authorId) {
-  return this.find({ authorId:authorId },
-    (error) => {
-      if (error) {
-        console.log(error);
-      }
-    });
+/**
+ * Returns a list of all books given by an author id
+ * @param authorId
+ * @returns {Query|void|index|number|*|T}
+ */
+bookSchema.statics.findByAuthorId = function (authorId, callback) {
+  return this.find({ authorId:authorId }, wrapCallbackForErrors(callback));
 };
 
-/*
-Ideally returns a list of Books with the same rating,
-needs thought due to how ratings will work?
+/**
+ * Wrapper for updating a book
+ * @param bookId
+ * @param update
+ * @param callback
+ * @returns {*}
+ */
+bookSchema.statics.updateBook = function (bookId, update, callback) {
+  return this.findByIdAndUpdate(
+    bookId,
+    update,
+    {
+      new:true,
+      runValidators:true
+    },
+    wrapCallbackForErrors(callback)
+  );
+};
 
-bookSchema.statics.findByRating = function(rating){
-    return this.find({rating:rating},
-        function(error){
-            console.log(error);
-        });
-} */
+/**
+ * Deletes the book indicated by the id
+ * @param id
+ * @param callback
+ * @returns {*}
+ */
+bookSchema.statics.deleteBook = function (id, callback) {
+  return this.findByIdAndDelete(
+    id,
+    {},
+    wrapCallbackForErrors(callback)
+  );
+};
 
 module.exports = mongoose.model('Book', bookSchema);
