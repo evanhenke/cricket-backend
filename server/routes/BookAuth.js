@@ -66,7 +66,7 @@ module.exports = function () {
           },
           (error, book) => {
             if (error) {
-              ErrorHandler.handle(error);
+              ErrorHandler.handle(error, res);
             } else {
               res.json(book);
             }

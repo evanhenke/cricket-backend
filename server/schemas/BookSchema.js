@@ -23,7 +23,15 @@ const bookSchema = new Schema({
   },
   pages: [{
     type:String,
-    required:true
+    required:true,
+    minlength:[
+      1,
+      'Page length needs to be, at least, one (1) character.'
+    ],
+    maxlength:[
+      300,
+      'Page length can be no longer than three hundred characters.'
+    ]
   }],
   rating: {
     type:Number,
@@ -51,7 +59,7 @@ bookSchema.statics.findAll = function (callback) {
  * @returns {Query|void}
  */
 bookSchema.statics.findById = function (id, callback) {
-  return this.findOne({ _id:id },wrapCallbackForErrors(callback));
+  return this.findOne({ _id:id }, wrapCallbackForErrors(callback));
 };
 
 /**
