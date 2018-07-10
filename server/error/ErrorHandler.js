@@ -23,7 +23,7 @@ module.exports = function ErrorHandler() {
   const wrapCallbackForErrors = function (callback) {
     return function (error, result) {
       if (error) {
-        callback(new CricketError(error));
+        callback(new CricketError(error.message));
       } else if (!result) {
         callback(new NoResourceReturnedError('No result from web service when a result is expected!'));
       } else {
@@ -34,7 +34,7 @@ module.exports = function ErrorHandler() {
 
   const handleNoResponse = function (error) {
     console.log(`no response object.. error is: ${error.stack}`);
-  }
+  };
 
   const handle = function (error, response) {
     if (!response) {

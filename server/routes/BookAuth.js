@@ -1,7 +1,6 @@
 const express = require('express');
 const User = require('./../schemas/UserSchema');
 const Book = require('./../schemas/BookSchema');
-const Page = require('./../schemas/PageSchema');
 const ErrorHandler = require('./../error/ErrorHandler')();
 const NotAuthorizedError = require('./../error/types/NotAuthorizedError');
 
@@ -33,22 +32,14 @@ module.exports = function () {
             Book.create({
               title: req.body.title,
               authorId: req.user._id,
+              pages:[
+                'This is the first page!'
+              ]
             }, (err, book) => {
               if (err) {
                 ErrorHandler(err, res);
               } else {
-                Page.create({
-                  bookId: book._id,
-                  pageNumber: 1,
-                  text: 'This is the first page!'
-                }, (e, page) => {
-                  if (e) {
-                    ErrorHandler.handle(e, res);
-                  } else {
-                    console.log(JSON.stringify(page));
-                    res.json(book);
-                  }
-                });
+                res.json(book);
               }
             });
           }
@@ -58,14 +49,19 @@ module.exports = function () {
       }
     });
 
-  bookAuthRouter.route('/book/:id')
+  bookAuthRouter.route('/book')
+  /**
+   * PUT request to edit a book
+   */
     .put((req, res) => {
       if (req.user._id === req.body.authorId) {
-        Book.updateBook(
-          req.params.id,
+        Book.updateBookById(
+          req.body._id,
           {
             $set: {
-              title:req.body.title
+              title:req.body.title,
+              pages:req.body.pages,
+              __v:req.body.__v += 1
             }
           },
           (error, book) => {
@@ -86,19 +82,13 @@ module.exports = function () {
      */
     .delete((req, res) => {
       if (req.user._id === req.body.authorId) {
-        Book.deleteBook(
+        Book.deleteBookById(
           req.body._id,
           (error, result) => {
             if (error) {
               ErrorHandler.handle(error, res);
             } else {
-              Page.deleteAllPages(req.body._id, (err) => {
-                if (err) {
-                  ErrorHandler.handle(err, res);
-                } else {
-                  res.json(result);
-                }
-              });
+              res.json(result);
             }
           }
         );

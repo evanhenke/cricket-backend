@@ -1,9 +1,10 @@
 const passport = require('passport');
+const localStrategy = require('./localstrategy');
 
 function passportConfig(app) {
   app.use(passport.initialize());
   app.use(passport.session());
-  require('./localstrategy')();
+  localStrategy();
 
   passport.serializeUser((user, done) => {
     console.log(`serialize user ${user}`);

@@ -4,9 +4,10 @@ const passport = require('passport');
 const authRouter = express.Router();
 const userAuthRouter = require('./../UserAuth');
 const bookAuthRouter = require('./../BookAuth');
+const passportConfig = require('./passport');
 
 module.exports = function () {
-  require('./passport')(authRouter);
+  passportConfig(authRouter);
 
   authRouter.route('/auth/login')
     /**

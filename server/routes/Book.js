@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const express = require('express');
 const User = require('../schemas/UserSchema.js');
 const Book = require('../schemas/BookSchema.js');
-const Page = require('../schemas/PageSchema.js');
 const ErrorHandler = require('./../error/ErrorHandler')();
 
 const bookRouter = express.Router();
@@ -20,31 +19,6 @@ module.exports = function () {
           res.json(books);
         }
       });
-    })
-    /**
-       * Updates a book
-       */
-    .put((req, res) => {
-      Book.findByIdAndUpdate(
-        mongoose.Types.ObjectId(req.body.id),
-        {
-          $set:{
-            title:req.body.title,
-            rating:req.body.rating
-          }
-        },
-        {
-          new:true,
-          runValidators:true
-        },
-        (error, book) => {
-          if (error) {
-            res.json(book);
-          } else {
-            res.json(book);
-          }
-        }
-      );
     });
 
   bookRouter.route('/book/:username')
@@ -63,20 +37,6 @@ module.exports = function () {
               res.json(books);
             }
           });
-        }
-      });
-    });
-
-  bookRouter.route('/:id/pages')
-  /**
-   * GET all pages given by a book id
-   */
-    .get((req, res) => {
-      Page.findPagesByBookId(req.body._id, (error, pages) => {
-        if (error) {
-          ErrorHandler.handle(error);
-        } else {
-          res.json(pages);
         }
       });
     });

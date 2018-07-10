@@ -31,7 +31,8 @@ module.exports = function () {
             $set: {
               firstName: req.body.firstName,
               lastName: req.body.lastName,
-              email: req.body.email
+              email: req.body.email,
+              __v: req.body.__v += 1
             }
           },
           (error, user) => {

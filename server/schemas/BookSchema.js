@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const { Schema } = mongoose;
 const { wrapCallbackForErrors } = require('./../error/ErrorHandler')();
 
@@ -20,6 +21,10 @@ const bookSchema = new Schema({
     ref:'User',
     required:true
   },
+  pages: [{
+    type:String,
+    required:true
+  }],
   rating: {
     type:Number,
     min:1,
@@ -74,7 +79,7 @@ bookSchema.statics.findByAuthorId = function (authorId, callback) {
  * @param callback
  * @returns {*}
  */
-bookSchema.statics.updateBook = function (bookId, update, callback) {
+bookSchema.statics.updateBookById = function (bookId, update, callback) {
   return this.findByIdAndUpdate(
     bookId,
     update,
@@ -92,8 +97,8 @@ bookSchema.statics.updateBook = function (bookId, update, callback) {
  * @param callback
  * @returns {*}
  */
-bookSchema.statics.deleteBook = function (id, callback) {
-  return this.findByIdAndDelete(
+bookSchema.statics.deleteBookById = function (id, callback) {
+  return this.findByIdAndRemove(
     id,
     {},
     wrapCallbackForErrors(callback)
